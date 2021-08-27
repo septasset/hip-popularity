@@ -268,6 +268,9 @@ class HIP(object):
 
             mu0, theta0, C0, c0, gamma0, eta0 = init_optimizer.x
             J0 = init_optimizer.fun
+            
+            if np.isnan(J0): continue
+
             # line search in logspace (10e-4*J0, 10*J0)
             for w0 in np.arange(np.log(10 ** -4 * J0), np.log(10 * J0), 1):
                 w0 = np.exp(w0)
@@ -285,7 +288,8 @@ class HIP(object):
                     best_params0 = reg_params0
 
             # display process bar
-            print('--- Finish initialization set {0}...'.format(t+1))
+            if (t+1)%5==0:
+                print('--- Finish initialization set {0}...'.format(t+1))
 
         # re-train on the first self.num_train days
         best_optimizer = optimize.minimize(self.cost_function, best_initial_weight, jac=self.grad_descent,

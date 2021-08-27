@@ -4,7 +4,7 @@
 from __future__ import print_function, division
 import os, bz2, json, time
 from datetime import timedelta
-import cPickle as pickle
+# import cPickle as pickle
 
 from pyhip import HIP
 
@@ -13,21 +13,21 @@ if __name__ == '__main__':
     # First time it gets loaded from the JSON format and writes essential fields into a pickle binary file.
     # check if the binary exists
     if not os.path.exists('./data/active-dataset.p'):
-        print('>>> Converting ACTIVE dataset from JSON format to pickle... might take a while!')
+#         print('>>> Converting ACTIVE dataset from JSON format to pickle... might take a while!')
         active_videos = {}
         with bz2.BZ2File('./data/active-dataset.json.bz2') as f:
             dataset = json.loads(f.readline())
             for video in dataset:
                 active_videos[video['YoutubeID']] = (video['numShare'], video['dailyViewcount'], video['watchTime'])
-        pickle.dump(active_videos, open('./data/active-dataset.p', 'wb'))
+#         pickle.dump(active_videos, open('./data/active-dataset.p', 'wb'))
 
-    print('>>> Loading the ACTIVE dataset from pickle...')
-    active_videos = pickle.load(open('./data/active-dataset.p', 'rb'))
+#     print('>>> Loading the ACTIVE dataset from pickle...')
+#     active_videos = pickle.load(open('./data/active-dataset.p', 'rb'))
 
     # == == == == == == == == Part 2: Fit model and forecast future volume == == == == == == == == #
     start_time = time.time()
     # select exemplary video
-    test_vid = 'X0ZEt_GZfkA'
+    test_vid = '00-6OyXVA0M' # 'X0ZEt_GZfkA'
 
     # uncomment next 2 lines if select random video
     # import random
