@@ -4,3 +4,7 @@
 .Ruserdata
 code.Rproj
 .ipynb_checkpoints
+
+__pycache__/*
+output/*
+data/active-dataset.json
