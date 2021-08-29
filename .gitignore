@@ -6,5 +6,5 @@ code.Rproj
 .ipynb_checkpoints
 
 __pycache__/*
-output/*
+#output/*
 data/active-dataset.json
