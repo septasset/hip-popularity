@@ -248,7 +248,7 @@ class HIP(object):
         grad_eta = np.sum((view_predict - y) * grad_eta_vector) + w0 * eta / eta0 / eta0
         return np.array([grad_mu, grad_theta, grad_C, grad_c, grad_gamma, grad_eta]) / n
 
-    def fit_with_bfgs(self):
+    def fit_with_bfgs(self, display=True):
         """ Fit HIP with BFGS optimization tool.
         """
         # bound all parameter to be positive
@@ -288,8 +288,9 @@ class HIP(object):
                     best_params0 = reg_params0
 
             # display process bar
-            if (t+1)%5==0:
-                print('--- Finish initialization set {0}...'.format(t+1))
+            if display:
+                if (t+1)%5==0:
+                    print('--- Finish initialization set {0}...'.format(t+1))
 
         # re-train on the first self.num_train days
         best_optimizer = optimize.minimize(self.cost_function, best_initial_weight, jac=self.grad_descent,
@@ -297,8 +298,9 @@ class HIP(object):
                                            args=(self.x[:self.num_train], self.y[:self.num_train], best_params0),
                                            bounds=bounds)
         self.set_parameters(best_optimizer.x)
-        print('--- Model fitting RMSE: {0:.2f}'.format(self._compute_fitting_error()))
-        print('--- Model forecast RMSE: {0:.2f}'.format(self._compute_forecast_error()))
+        if display:
+            print('--- Model fitting RMSE: {0:.2f}'.format(self._compute_fitting_error()))
+            print('--- Model forecast RMSE: {0:.2f}'.format(self._compute_forecast_error()))
 
     # plot function for fitting and forecasting process
     def plot_func(self, title):

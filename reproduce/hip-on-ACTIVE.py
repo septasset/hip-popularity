@@ -12,7 +12,7 @@ sys.path.insert(0, '../')
 from pyhip import HIP
 
 # python hip-on-ACTIVE.py --batchSize 400 --batchNo 
-# expect to take 8hrs
+# actually take 15 hrs
 
 dataset_path = "../data/active-dataset.json.bz2"
 output_path = "../output/active_res"
@@ -64,11 +64,12 @@ def main():
     
     # train-test, write results
     ress = {}
+    count = 0
     for test_vid in vids[bNo*size:bNo*size+size]:
         daily_share, daily_view, daily_watch, cate = active_videos[test_vid]
         hip_model = HIP()
         hip_model.initial(daily_share, daily_view, num_train, num_test, num_initialization)
-        hip_model.fit_with_bfgs()
+        hip_model.fit_with_bfgs(False)
 
         hip_params = hip_model.get_parameters()
         hip_predict = hip_model.predict(hip_model.get_parameters_abbr(), hip_model.x[:num_train+num_test])
@@ -79,6 +80,9 @@ def main():
             "dailyViewcount":hip_model.y[:num_train+num_test],
         }
         ress[test_vid] = res
+        count+=1
+        if count % (size//20) == 0:
+            print(">>> Progress: {}/{}".format(count, size))
 
     with open("{}_{}_{}.json".format(output_path, bNo*size, bNo*size+size), "w") as outfile:
         json.dump(ress, outfile)
