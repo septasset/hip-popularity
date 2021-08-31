@@ -15,7 +15,7 @@ from pyhip import HIP
 # actually take 15 hrs
 
 dataset_path = "../data/active-dataset.json.bz2"
-output_path = "../output/active_res"
+output_path = "../output/active_output/active_res"
 vidsOrder_path = "../data/active-dataset-vids-order.json"
 
 attributes = ["YoutubeID","numTweet","numShare","numSubscriber","watchTime","dailyViewcount",\
