@@ -106,7 +106,7 @@ def total_log_at(days, series, vids, accumulate=False):
 """
 Plots
 """
-def plot_popPerc_totalViews(days, df_total_views, pop_percs_gt):
+def plot_popPerc_totalViews(days, df_total_views, pop_percs_gt, fig):
     """ assume days to be of length 2
     """
     noBins = 40
@@ -132,8 +132,7 @@ def plot_popPerc_totalViews(days, df_total_views, pop_percs_gt):
         ax.set_title("day@{}".format(days[i]), color="blue")
         ax.set_xticks([k*2 for k in range(1, noBins//2+1)])
         ax.set_xticklabels(['{0:.2f}'.format(k*2*bin_width) for k in range(1, noBins//2+1)])
-    
-    fig = plt.figure(figsize=(12, 6))
+        
     ax = fig.add_subplot(111)
     ax.boxplot(popPerc_eval)
     ax.set_ylabel("Popularity percentile day@{}".format(days[0]), color="blue")
@@ -142,34 +141,65 @@ def plot_popPerc_totalViews(days, df_total_views, pop_percs_gt):
     ax.set_xticklabels(['{0:.2f}'.format(k*2*bin_width) for k in range(1, noBins//2+1)])
     return total_views_binned
     
-def plot_fixed_window(days, df, test_category):    
-    data = [dict() for x in days[1:]]
+def plot_fixed_window(days, df, test_category, fig, title, average_daily = False):
+    """return vids in each x bin"""
+    by = "average-daily" if average_daily else "period-total"    
     index = df.index
     
+    data = [dict() for x in days[1:]]
+    res = dict()
+    
     for i in index:
+        if average_daily:
+            short_term = "{:.1f}".format(df.loc[i, days[0]] - math.log(days[0], 10))
+        else:
+            short_term = "{:.1f}".format(df.loc[i, days[0]])        
         for j, d in enumerate(days[1:]):
-            short_term = "{:.1f}".format(df.loc[i, days[0]])
+            if average_daily:
+                long_term = df.loc[i, d] - math.log(days[j+1]-days[j], 10)
+            else:
+                long_term = df.loc[i, d]
+                
             if short_term not in data[j]:
-                data[j][short_term]=[]   
-            data[j][short_term].append(df.loc[i, d])
-                                     
-    fig = plt.figure(figsize=(12, 12))
+                data[j][short_term]=[]
+            data[j][short_term].append(long_term)
+        if float(short_term) not in res:
+            res[float(short_term)] = []
+        res[float(short_term)].append(i)
+                                         
     ax = fig.add_subplot(111)
     lines = []
+    xs = [float(x) for x in list(data[0].keys())]
+    xs.sort()
+#     print(xs)
     for j in range(len(data)):
-        xs = [float(x) for x in list(data[j].keys())]
-        xs.sort()
         ys = [np.mean(data[j][str(x)]) for x in xs]
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 #         if j == len(data)-1:
 #             print(xs[-5:])
 #             print([data[j][str(x)] for x in xs][-5:])
-    ax.set_ylabel("Long-term average daily views(log)", color="blue", fontsize=16)
-    ax.set_xlabel("Short-term average daily views(log)", color="blue", fontsize=16)
-    ax.set_title("All of {}({})".format(test_category, len(df.index)), color="blue", fontsize=18)
-    ax.legend(fontsize ="xx-large")
-    plt.savefig('figs/{}.png'.format(test_category))
+
+    ax.set_ylabel("Long-term {} views(log)".format(by), color="blue", fontsize=16)
+    ax.set_xlabel("Short-term {} views(log)".format(by), color="blue", fontsize=16)
+    ax.set_title(title, color="blue", fontsize=18)
+    ax.legend(fontsize ="xx-large")    
+    ax.plot(xs, xs, color="grey", linestyle="--", linewidth=1)
+    
+    xs_count = [len(data[0][str(x)]) for x in xs]
+    ax2 = ax.twinx()
+    ax2.plot(xs, xs_count, color="violet", linestyle="-.")
+    ax2.set_ylabel("#Videos in Short-term bin", color="violet", fontsize=16)
+    
+    ax.set_yticks(np.linspace(np.floor(ax.get_ybound()[0]), np.ceil(ax.get_ybound()[1]), \
+                         1+int(np.ceil(ax.get_ybound()[1]) - np.floor(ax.get_ybound()[0]))))
+    ax2.set_ylim(0, ax2.get_ylim()[1])
+    new_y = np.linspace(0, ax2.get_yticks()[-1], ax.get_yticks().size)
+    new_y = np.linspace(0, new_y[1], 6).tolist() + new_y.tolist()[1:]
+    ax2.set_yticks(new_y)
+    ax.grid(which="both", color="silver", linestyle="--", linewidth=1)
+    
+    return res
     
     
     
