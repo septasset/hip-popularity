@@ -8,3 +8,4 @@ code.Rproj
 __pycache__/*
 #output/*
 data/active-dataset.json
+*DS_Store
