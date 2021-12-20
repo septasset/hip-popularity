@@ -103,6 +103,17 @@ def total_log_at(days, series, vids, accumulate=False):
     df_series_eval = pd.DataFrame(series_eval, columns =days, index = vids_filter)
     return df_series_eval
 
+def area_between_scatter_lines(line1, line2, xs):
+    """
+    """
+    area = 0
+    for i in range(len(line1)-1):
+        dots1 = line1[i:i+2]
+        dots2 = line2[i:i+2]
+        distance = xs[i+1] - xs[i]
+        area += 0.5*(abs(dots1[0]-dots2[0])+abs(dots1[1]-dots2[1]))*distance
+    return area
+
 """
 Plots
 """
@@ -140,7 +151,9 @@ def plot_popPerc_totalViews(days, df_total_views, pop_percs_gt, fig):
     return total_views_binned
     
 def plot_fixed_window(days, df, test_category, fig, title, average_daily = True):
-    """return vids in each x bin"""
+    """
+    :return: (vids-in-each-bin, xs, yss)
+    """
     by = "average-daily" if average_daily else "period-total"    
     index = df.index
     
@@ -169,8 +182,11 @@ def plot_fixed_window(days, df, test_category, fig, title, average_daily = True)
     lines = []
     xs = [float(x) for x in list(data[0].keys())]
     xs.sort()
+    
+    yss = []
     for j in range(len(data)):
         ys = [np.mean(data[j][str(x)]) for x in xs]
+        yss.append(ys)
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 
@@ -193,11 +209,13 @@ def plot_fixed_window(days, df, test_category, fig, title, average_daily = True)
     ax2.set_yticks(new_y)
     ax.grid(which="both", color="silver", linestyle="--", linewidth=1)
     
-    return res
+    return res, xs, yss
    
 """Modified from plot_fixed_window"""
 def plot_fixed_window_double_log(days, df, test_category, fig, title, average_daily = True):
-    """return vids in each x bin"""
+    """
+    :return: (vids-in-each-bin, xs, yss)
+    """
     by = "average-daily" if average_daily else "period-total"    
     index = df.index
     
@@ -226,8 +244,11 @@ def plot_fixed_window_double_log(days, df, test_category, fig, title, average_da
     lines = []
     xs = [float(x) for x in list(data[0].keys())]
     xs.sort()
+    
+    yss = []
     for j in range(len(data)):
         ys = [np.mean(data[j][str(x)]) for x in xs]
+        yss.append(ys)
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 
@@ -250,12 +271,12 @@ def plot_fixed_window_double_log(days, df, test_category, fig, title, average_da
     ax2.set_yticks(new_y)
     ax.grid(which="both", color="silver", linestyle="--", linewidth=1)
     
-    return res
+    return res, xs, yss
     
 def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_daily = True, smooth_times = 1):
     """
     :param smooth_times: 1 means 0.1
-    :return: vids in each x bin
+    :return: (vids-in-each-bin, yss)
     """
     by = "average-daily" if average_daily else "period-total"    
     index = df.index
@@ -290,8 +311,11 @@ def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_da
     lines = []
     xs = [float(x) for x in list(data[0].keys())]
     xs.sort()
+        
+    yss = []    
     for j in range(len(data)):
         ys = [np.mean(data[j][str(x)]) for x in xs]
+        yss.append(ys)
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 
@@ -314,7 +338,6 @@ def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_da
     ax2.set_yticks(new_y)
     ax.grid(which="both", color="silver", linestyle="--", linewidth=1)
     
-    return res    
+    return res, xs, yss 
     
-    
-    
+        
