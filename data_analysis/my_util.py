@@ -111,8 +111,8 @@ def area_between_scatter_lines(line1, line2, xs):
         dots1 = line1[i:i+2]
         dots2 = line2[i:i+2]
         distance = xs[i+1] - xs[i]
-        area += 0.5*(abs(dots1[0]-dots2[0])+abs(dots1[1]-dots2[1]))*distance
-    return area
+        area += 0.5*((dots1[0]-dots2[0])+(dots1[1]-dots2[1]))*distance
+    return abs(area)
 
 """
 Plots
@@ -278,6 +278,7 @@ def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_da
     :param smooth_times: 1 means 0.1
     :return: (vids-in-each-bin, yss)
     """
+    tmpt = [[], []]
     by = "average-daily" if average_daily else "period-total"    
     index = df.index
     
@@ -286,14 +287,15 @@ def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_da
     
     for i in index:
         if average_daily:
-            short_term = "{:.1f}".format(df.loc[i, days[0]] - math.log(days[0], 10))
+            short_term = df.loc[i, days[0]] - math.log(days[0], 10)
         else:
-            short_term = "{:.1f}".format(df.loc[i, days[0]])
+            short_term = df.loc[i, days[0]]
             
-        if smooth_times != 1: # bin smooth
-            scale = 0.1*smooth_times
-            short_term_float = (float(short_term) // (scale)) * scale
-            short_term = "{:.1f}".format(short_term_float)
+        # bin smooth           
+        scale = 0.1*smooth_times
+        short_term_float = (short_term // (scale)) * scale
+        short_term = "{:.1f}".format(short_term_float)
+            
         for j, d in enumerate(days[1:]):
             if average_daily:
                 long_term = df.loc[i, d] - math.log(days[j+1]-days[j], 10)
