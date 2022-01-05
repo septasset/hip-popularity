@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-filter_thres = 10
+filter_thres = 0
 
 def total_at_no_filter(days, series, vids, accumulate=False):
     """ compute total number of a series(views/shares...) at several evaluation days
@@ -150,7 +150,7 @@ def plot_popPerc_totalViews(days, df_total_views, pop_percs_gt, fig):
     ax.set_xticklabels(['{0:.2f}'.format(k*2*bin_width) for k in range(1, noBins//2+1)])
     return total_views_binned
     
-def plot_fixed_window(days, df, test_category, fig, title, average_daily = True):
+def plot_fixed_window(days, df, test_category, fig, title, average_daily = True, attr = "views"):
     """
     :return: (vids-in-each-bin, xs, yss)
     """
@@ -190,8 +190,8 @@ def plot_fixed_window(days, df, test_category, fig, title, average_daily = True)
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 
-    ax.set_ylabel("Long-term {} views(log)".format(by), color="blue", fontsize=16)
-    ax.set_xlabel("Short-term {} views(log)".format(by), color="blue", fontsize=16)
+    ax.set_ylabel("Long-term {} {}(log)".format(by, attr), color="blue", fontsize=16)
+    ax.set_xlabel("Short-term {} {}(log)".format(by, attr), color="blue", fontsize=16)
     ax.set_title(title, color="blue", fontsize=18)
     ax.legend(fontsize ="xx-large")    
     ax.plot(xs, xs, color="grey", linestyle="--", linewidth=1)
@@ -212,7 +212,7 @@ def plot_fixed_window(days, df, test_category, fig, title, average_daily = True)
     return res, xs, yss
    
 """Modified from plot_fixed_window"""
-def plot_fixed_window_double_log(days, df, test_category, fig, title, average_daily = True):
+def plot_fixed_window_double_log(days, df, test_category, fig, title, average_daily = True, attr = "views"):
     """
     :return: (vids-in-each-bin, xs, yss)
     """
@@ -252,8 +252,8 @@ def plot_fixed_window_double_log(days, df, test_category, fig, title, average_da
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 
-    ax.set_ylabel("Long-term {} views(log)".format(by), color="blue", fontsize=16)
-    ax.set_xlabel("Short-term {} views(log)".format(by), color="blue", fontsize=16)
+    ax.set_ylabel("Long-term {} {}(log)".format(by, attr), color="blue", fontsize=16)
+    ax.set_xlabel("Short-term {} {}(log)".format(by, attr), color="blue", fontsize=16)
     ax.set_title(title, color="blue", fontsize=18)
     ax.legend(fontsize ="xx-large")    
     ax.plot(xs, xs, color="grey", linestyle="--", linewidth=1)
@@ -273,7 +273,7 @@ def plot_fixed_window_double_log(days, df, test_category, fig, title, average_da
     
     return res, xs, yss
     
-def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_daily = True, smooth_times = 1):
+def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_daily = True, smooth_times = 1, attr = "views"):
     """
     :param smooth_times: 1 means 0.1
     :return: (vids-in-each-bin, yss)
@@ -321,8 +321,8 @@ def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_da
         line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
         lines.append(line)
 
-    ax.set_ylabel("Long-term {} views(log)".format(by), color="blue", fontsize=16)
-    ax.set_xlabel("Short-term {} views(log)".format(by), color="blue", fontsize=16)
+    ax.set_ylabel("Long-term {} {}(log)".format(by, attr), color="blue", fontsize=16)
+    ax.set_xlabel("Short-term {} {}(log)".format(by, attr), color="blue", fontsize=16)
     ax.set_title(title, color="blue", fontsize=18)
     ax.legend(fontsize ="xx-large")    
     ax.plot(xs, xs, color="grey", linestyle="--", linewidth=1)
