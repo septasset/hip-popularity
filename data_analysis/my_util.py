@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-filter_thres = 0
+filter_thres = 10
 
 def total_at_no_filter(days, series, vids, accumulate=False):
     """ compute total number of a series(views/shares...) at several evaluation days
@@ -102,6 +102,33 @@ def total_log_at(days, series, vids, accumulate=False):
     
     df_series_eval = pd.DataFrame(series_eval, columns =days, index = vids_filter)
     return df_series_eval
+
+# def total_log_at_no_filter(days, series, vids, accumulate=False):
+#     """ compute total number at log scale of a series(views/shares...) at several evaluation days
+#     :return: a dataframe
+#     :param accumulate: when false, sum from last day to current day
+#     """
+#     series_eval = []
+#     vids_filter = []
+#     for i in range(len(series)):
+        
+#         if accumulate:
+#             series_accu = [np.sum(series[i][:day]) for day in days]
+#         else:
+#             series_accu = []
+#             for j in range(len(days)):
+#                 if j==0: 
+#                     eval_sum = np.sum(series[i][:days[j]])
+#                     eval_avg = eval_sum / days[j]
+#                 else: 
+#                     eval_sum = np.sum(series[i][days[j-1]:days[j]])
+#                     eval_avg = eval_sum / (days[j]-days[j-1])
+#                 series_accu.append(math.log(eval_sum, 10))        
+#         series_eval.append(series_accu)
+#         vids_filter.append(vids[i])
+    
+#     df_series_eval = pd.DataFrame(series_eval, columns =days, index = vids_filter)
+#     return df_series_eval
 
 def area_between_scatter_lines(line1, line2, xs):
     """
