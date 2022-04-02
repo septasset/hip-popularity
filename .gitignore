@@ -9,4 +9,5 @@ __pycache__/*
 .__pycache__/*
 #output/*
 data/active-dataset.json
+data/twitters-data/*
 *DS_Store
