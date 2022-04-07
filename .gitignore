@@ -7,6 +7,7 @@ code.Rproj
 
 __pycache__/*
 .__pycache__/*
+curate-twitters/__pycache__/*
 #output/*
 data/active-dataset.json
 data/twitters-data/*
