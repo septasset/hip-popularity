@@ -39,30 +39,37 @@ def build_dataset(indir, outdir, vids_path):
     daily_tweets_files.sort(key=lambda x:datetime.datetime.strptime(os.path.split(x)[1].split(".")[0], "%Y-%m-%d"))
     
     for infile in tqdm(daily_tweets_files, desc="daily tweets files"):
-        date_str = os.path.split(infile)[1].split(".")[0]
-        date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-        date_aligned = date - datetime.timedelta(days=1)
+#         date_str = os.path.split(infile)[1].split(".")[0]
+#         date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+#         date_aligned = date - datetime.timedelta(days=1)
         
         daily_tweets = pickle.load(open(infile, "rb"))
-        for vid, tweetCounts in daily_tweets.items():
-            total += 1
-            cat = find_category(vid, map_category_vids) 
-            if cat is None: 
-                num_not_in_engage += 1
-                continue                
-            if cat not in dataset:
-                dataset[cat] = dict()
-                
-            if vid not in dataset[cat]:
-                dataset[cat][vid] = {
-                    "day_zero": date_aligned.strftime("%Y-%m-%d"),
-                    "days": [0],
-                    "tweets": [tweetCounts]
-                }
-            else:
-                offset_day = (date_aligned - datetime.datetime.strptime(dataset[cat][vid]["day_zero"], "%Y-%m-%d")).days
-                dataset[cat][vid]["days"].append(offset_day)
-                dataset[cat][vid]["tweets"].append(tweetCounts)
+        for date in sorted(list(daily_tweets.keys()), key=lambda x:datetime.datetime.strptime(x, "%Y-%m-%d")):
+            date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            data = daily_tweets[date]
+            
+            for vid, tweetCounts in data.items():
+                total += 1
+                cat = find_category(vid, map_category_vids) 
+                if cat is None: 
+                    num_not_in_engage += 1
+                    continue                
+                if cat not in dataset:
+                    dataset[cat] = dict()
+
+                if vid not in dataset[cat]:
+                    dataset[cat][vid] = {
+                        "day_zero": date,
+                        "days": [0],
+                        "tweets": [tweetCounts]
+                    }
+                else:
+                    offset_day = (date_obj - datetime.datetime.strptime(dataset[cat][vid]["day_zero"], "%Y-%m-%d")).days
+                    if offset_day != dataset[cat][vid]["days"][-1]:
+                        dataset[cat][vid]["days"].append(offset_day)
+                        dataset[cat][vid]["tweets"].append(tweetCounts)
+                    else:
+                        dataset[cat][vid]["tweets"] += tweetCounts
     
     # write to disk
     for category, data in tqdm(dataset.items(), desc="Write dataset"):       
@@ -86,7 +93,7 @@ if __name__ == "__main__":
     ap = args.parse_args()
     
     t1 = datetime.datetime.now()
-    dirtodir_read_dump(ap.indir, ap.intermediatedir)
+    dirtodir_read_dump(ap.indir, ap.intermediatedir, date_range=("2016-07-02", "2017-08-06"))
     t2 = datetime.datetime.now()
     print("Total time step 1:{} seconds".format((t2-t1).total_seconds()))
     

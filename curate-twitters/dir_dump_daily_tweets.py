@@ -1,6 +1,7 @@
 import bz2, os, sys, glob
 import json, csv, re, datetime
 import pickle
+import collections
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
@@ -14,13 +15,20 @@ def bz2_csv_rows(fp):
             
 def read_write_file(infile, outfile):
     """
-    {
-        vid_1: tweetCounts,
-        vid_2: tweetCounts,
-        ...
+    {        
+        date1:{
+            vid_1: tweetCounts,
+            vid_2: tweetCounts,
+            ...
+        }
+        date2:{
+            vid_1: tweetCounts,
+            vid_3: tweetCounts,
+            ...
+        }
     }
     """
-    map_vid_tweetCounts = {}
+    map_vid_tweetCounts = collections.defaultdict(dict)
     all_vids = []    
     all_dates = []
 
@@ -48,9 +56,9 @@ def read_write_file(infile, outfile):
             vids.extend(quoted_vids.split(";"))
         
         for vid in vids:
-            if vid not in map_vid_tweetCounts:
-                map_vid_tweetCounts[vid] = 0
-            map_vid_tweetCounts[vid] += 1
+            if vid not in map_vid_tweetCounts[date]:
+                map_vid_tweetCounts[date][vid] = 0
+            map_vid_tweetCounts[date][vid] += 1
         
         all_vids.append(vids)
         all_dates.append(date)
