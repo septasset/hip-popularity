@@ -45,7 +45,7 @@ def build_dataset(indir, outdir, vids_path):
         
         daily_tweets = pickle.load(open(infile, "rb"))
         for date in sorted(list(daily_tweets.keys()), key=lambda x:datetime.datetime.strptime(x, "%Y-%m-%d")):
-            date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
             data = daily_tweets[date]
             
             for vid, tweetCounts in data.items():
@@ -69,7 +69,7 @@ def build_dataset(indir, outdir, vids_path):
                         dataset[cat][vid]["days"].append(offset_day)
                         dataset[cat][vid]["tweets"].append(tweetCounts)
                     else:
-                        dataset[cat][vid]["tweets"] += tweetCounts
+                        dataset[cat][vid]["tweets"][-1] += tweetCounts
     
     # write to disk
     for category, data in tqdm(dataset.items(), desc="Write dataset"):       
