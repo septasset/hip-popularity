@@ -14,3 +14,4 @@ data/twitters-data/*
 data/engage16/*.csv
 !data/engage16/filtered/vids_filter(all).csv
 *DS_Store
+phase_profiling/nohup.out
