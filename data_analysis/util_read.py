@@ -16,7 +16,7 @@ def engage_read(engage_dataset_base, category, eval_days = [90, 135, 180, 225, 2
     dataset = {}
     
     vids_set = set()
-    for line in tqdm(dataset_json, desc="{} in engage".format(category)):
+    for line in dataset_json:
         record = json.loads(line)
         try:        
             day = [int(x) for x in record['insights']['days'].split(",")]                        
@@ -132,3 +132,37 @@ def engage_metadata(engage_dataset_base, category, eval_days = [90, 135, 180, 22
             vids_set.add(record['id'])
 #     print("Engage {} size: {}".format(category, len(dataset.keys())))
     return dataset
+
+def compute_period_daily(merged_dataset, timepoint = 90):
+    stats = {
+        "vids": [],
+        "daily_views": [], "daily_shares": [], "daily_tweets": [],
+        "daily_views_st": [], "daily_views_lt": [],
+        "daily_shares_st": [], "daily_shares_lt": [],
+        "daily_tweets_st": [], "daily_tweets_lt": [],
+        "perc_views_lt": [], 
+    }
+    
+    for vid, vals in merged_dataset.items():
+        days = vals["days"]
+        left, right = 0, len(days) - 1
+        while left <= right:
+            mid = (left+right)//2
+            if mid <= 90:
+                left = mid + 1
+            else:
+                right = mid - 1
+        
+        stats["vids"].append(vid)
+        stats["daily_views"].append(np.mean(vals["viewCounts"]))
+        stats["daily_shares"].append(np.mean(vals["shares"]))
+        stats["daily_tweets"].append(np.mean(vals["tweets"]))
+        stats["daily_views_st"].append(np.mean(vals["viewCounts"][:left]))
+        stats["daily_views_lt"].append(np.mean(vals["viewCounts"][left:]))
+        stats["daily_shares_st"].append(np.mean(vals["shares"][:left]))
+        stats["daily_shares_lt"].append(np.mean(vals["shares"][left:]))
+        stats["daily_tweets_st"].append(np.mean(vals["tweets"][:left]))
+        stats["daily_tweets_lt"].append(np.mean(vals["tweets"][left:]))
+        stats["perc_views_lt"].append(np.sum(vals["viewCounts"][left:])/np.sum(vals["viewCounts"]))
+
+    return stats
