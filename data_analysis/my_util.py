@@ -82,7 +82,7 @@ def total_log_at(days, series, vids, accumulate=False):
     for i in range(len(series)):
         flag_filter = False
         if accumulate:
-            series_accu = [np.sum(series[i][:day]) for day in days]
+            series_accu = [math.log(np.sum(series[i][:day]), 10) for day in days]
         else:
             series_accu = []
             for j in range(len(days)):
