@@ -16,3 +16,4 @@ data/engage16/*.csv
 *DS_Store
 phase_profiling/nohup.out
 curate-twitters/figs/tmp/*
+data_analysis/figs/*.pdf
