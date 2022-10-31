@@ -369,4 +369,61 @@ def plot_fixed_window_bin_smooth(days, df, test_category, fig, title, average_da
     
     return res, xs, yss 
     
+def plot_bin_smooth_single_axis(days, df, fig, average_daily = True, smooth_times = 1, attr = "views"):
+    """
+    :param smooth_times: 1 means 0.1
+    :return: (vids-in-each-bin, yss)
+    """
+    tmpt = [[], []]
+    by = "average-daily" if average_daily else "period-total"    
+    index = df.index
+    
+    data = [dict() for x in days[1:]]
+    res = dict()
+    
+    for i in index:
+        if average_daily:
+            short_term = df.loc[i, days[0]] - math.log(days[0], 10)
+        else:
+            short_term = df.loc[i, days[0]]
+            
+        # bin smooth           
+        scale = 0.1*smooth_times
+        short_term_float = (short_term // (scale)) * scale
+        short_term = "{:.1f}".format(short_term_float)
+            
+        for j, d in enumerate(days[1:]):
+            if average_daily:
+                long_term = df.loc[i, d] - math.log(days[j+1]-days[j], 10)
+            else:
+                long_term = df.loc[i, d]
+                
+            if short_term not in data[j]:
+                data[j][short_term]=[]
+            data[j][short_term].append(long_term)
+        if float(short_term) not in res:
+            res[float(short_term)] = []
+        res[float(short_term)].append(i)
+                                         
+    ax = fig.add_subplot(111)
+    lines = []
+    xs = [float(x) for x in list(data[0].keys())]
+    xs.sort()
         
+    yss = []    
+    for j in range(len(data)):
+        ys = [np.mean(data[j][str(x)]) for x in xs]
+        yss.append(ys)
+        line = ax.plot(xs, ys, label = "{} - {}".format(days[j], days[j+1]))
+        lines.append(line)
+
+    ax.set_ylabel("Long-term {} {} (log)".format(by, attr))
+    ax.set_xlabel("Short-term {} {} (log)".format(by, attr))
+    ax.legend(fontsize ="xx-large")    
+    ax.plot(xs, xs, color="grey", linestyle="--", linewidth=1)
+            
+    ax.set_yticks(np.linspace(np.floor(ax.get_ybound()[0]), np.ceil(ax.get_ybound()[1]), \
+                         1+int(np.ceil(ax.get_ybound()[1]) - np.floor(ax.get_ybound()[0]))))   
+    ax.grid(which="both", color="silver", linestyle="--", linewidth=1)
+    
+    return res, xs, yss         
